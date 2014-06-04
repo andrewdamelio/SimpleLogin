@@ -1,3 +1,4 @@
+<img src='http://i.imgur.com/ZVL0Jkt.png'/>
 SimpleLogin
 ===========
 Authentication demo using AngularJS and
