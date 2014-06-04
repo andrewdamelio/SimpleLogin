@@ -1,4 +1,3 @@
-<img src='http://i.imgur.com/ZVL0Jkt.png'/>
 SimpleLogin
 ===========
 Authentication demo using AngularJS and
@@ -16,3 +15,5 @@ Authentication demo using AngularJS and
 <a href="https://www.firebase.com/docs/security/simple-login-google.html">Authenticating with Google</a><br />
 <a href="https://www.firebase.com/docs/security/simple-login-twitter.html">Authenticating with Twitter</a><br />
 <a href="https://www.firebase.com/docs/security/simple-login-github.html">Authenticating with GitHub</a><br />
+
+<img src='http://i.imgur.com/ZVL0Jkt.png'/>
