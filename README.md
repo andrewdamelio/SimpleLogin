@@ -11,7 +11,7 @@ Authentication demo using AngularJS and
 
 Authenticating Setup
 ===========
-<a href="simple-login-email-password.html">Email / Password Authentication</a><br />
-<a href="simple-login-google.html">Authenticating with Google</a><br />
-<a href="simple-login-twitter.html">Authenticating with Twitter</a><br />
-<a href="simple-login-github.html">Authenticating with GitHub</a><br />
+<a href="https://www.firebase.com/docs/security/simple-login-email-password.html">Email / Password Authentication</a><br />
+<a href="https://www.firebase.com/docs/security/simple-login-google.html">Authenticating with Google</a><br />
+<a href="https://www.firebase.com/docs/security/simple-login-twitter.html">Authenticating with Twitter</a><br />
+<a href="https://www.firebase.com/docs/security/simple-login-github.html">Authenticating with GitHub</a><br />
