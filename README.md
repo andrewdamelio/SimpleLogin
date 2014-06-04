@@ -9,8 +9,8 @@ Authentication demo using AngularJS and
 <a href='http://bittopia.ca/dev/SimpleLogin'>SimpleLogin Demo</a>
 
 
-Authenticating Setup
-===========
+<h4>Authenticating Setup</h4>
+
 <a href="https://www.firebase.com/docs/security/simple-login-email-password.html">Email / Password Authentication</a><br />
 <a href="https://www.firebase.com/docs/security/simple-login-google.html">Authenticating with Google</a><br />
 <a href="https://www.firebase.com/docs/security/simple-login-twitter.html">Authenticating with Twitter</a><br />
