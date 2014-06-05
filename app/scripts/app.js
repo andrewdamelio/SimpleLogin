@@ -15,24 +15,32 @@ app.config(['$routeProvider', function ($routeProvider) {
 
 app.constant('FIREBASE_URI', 'https://toronto.firebaseio.com/');
 
-app.factory('FirebaseService', ['$firebase', 'FIREBASE_URI', function($firebase, FIREBASE_URI){
-  
-      var getUserTable = function(provider) {
-      var myDataRef = new Firebase(FIREBASE_URI+'users/'+provider);
-        return $firebase(myDataRef);
+app.factory('FirebaseService', ['$firebase', '$firebaseSimpleLogin', 'FIREBASE_URI', function($firebase, $firebaseSimpleLogin, FIREBASE_URI){
+      
+      var getUserProfile = function(provider) {
+          var myDataRef = new Firebase(FIREBASE_URI+'users/'+provider);
+          return $firebase(myDataRef);
+      };
+
+      var getUserAuth = function(fn) {
+          var test = new FirebaseSimpleLogin(new Firebase(FIREBASE_URI), fn);
+          return test;
       };
 
       return {
-        getUserTable : getUserTable
+        getUserProfile : getUserProfile,
+        getUserAuth : getUserAuth
       };
 }]);
 
-app.controller('MainCtrl', ['$scope', 'FirebaseService', '$firebaseSimpleLogin', 'FIREBASE_URI', '$timeout', function ($scope, FirebaseService, $firebaseSimpleLogin, FIREBASE_URI, $timeout) {
+app.controller('MainCtrl', ['$scope', '$timeout', 'FirebaseService', function ($scope, $timeout, FirebaseService) {
     $scope.newUser = { email: '', password: '' };
     $scope.currentUser  = '';
     $scope.reset = false;
+    $scope.showImageChecked = true;
+    $scope.key;
 
-    $scope.auth = new FirebaseSimpleLogin(new Firebase(FIREBASE_URI), function(error, user) {
+    $scope.authCallback = function(error, user) {
         if (error) {
           // an error occurred while attempting login
           if (error.code === 'INVALID_PASSWORD') {
@@ -55,27 +63,31 @@ app.controller('MainCtrl', ['$scope', 'FirebaseService', '$firebaseSimpleLogin',
           $scope.provider = user.provider;
           $scope.currentUser = user;
           if (user.provider === 'twitter') {
-            $scope.currentUser.email = user.username;
+            $scope.currentUser.displayName = user.username;
             $scope.avatar = user.thirdPartyUserData.profile_image_url;
           }
           if (user.provider === 'github') {
-            $scope.currentUser.email = user.username;
+            $scope.currentUser.displayName = user.username;
             $scope.avatar = user.thirdPartyUserData.avatar_url;
           }
           if (user.provider === 'password') {
+            $scope.currentUser.displayName = user.email;
             $scope.avatar = user.md5_hash;
           }
           if (user.provider === 'google') {
+            $scope.currentUser.displayName = user.email;
             $scope.avatar = user.thirdPartyUserData.picture;
           }
-          $scope.createUser($scope.currentUser);
+          $scope.createProfile($scope.currentUser);
           $scope.resetForm();
         }
         else {
           // user is logged out
           $scope.currentUser = null;
         }
-    });
+    }
+
+    $scope.auth = FirebaseService.getUserAuth($scope.authCallback);
 
     $scope.login = function (email, password) {
         if (email  && password) {
@@ -104,48 +116,57 @@ app.controller('MainCtrl', ['$scope', 'FirebaseService', '$firebaseSimpleLogin',
         $scope.logged.$save();
     };
 
-    $scope.createUser = function(user) {
+    $scope.createProfile = function(user) {
         var newUser = true;
-      
-        $scope.logged = FirebaseService.getUserTable(user.provider);
+        $scope.logged = FirebaseService.getUserProfile(user.provider);
         $scope.logged.$on('loaded', function() {
             $timeout(function() {
                 var keys = $scope.logged.$getIndex();
                 angular.forEach(keys, function(key) {
-                    if (user.email === $scope.logged[key].user) {
-                      newUser = false;
-                      console.log('WELCOME BACK');
-                      $scope.key = key;
-                      $scope.showImageChecked = $scope.logged[key].showImage;
+                    if (user.uid === $scope.logged[key].uid) {
+                        newUser = false;
+                        $scope.key = key;
+                        $scope.showImageChecked = $scope.logged[key].showImage;
+                        console.log('WELCOME BACK');
                     }
                 });
                 if (newUser) {
-                  $scope.logged.$add({
-                      user:  user.email,
-                      showImage: true,
-                      exists : true
+                    $scope.logged.$add({
+                        uid : user.uid,
+                        user:  user.displayName,
+                        showImage: true,
                     });
+                    $scope.logged = FirebaseService.getUserProfile(user.provider);
+                    $scope.logged.$on('loaded', function() {
+                        var keys = $scope.logged.$getIndex();
+                        angular.forEach(keys, function(key) {
+                            if (user.uid === $scope.logged[key].uid) {
+                                console.log('FIRST SIGNIN');
+                                $scope.key = key;
+                                $scope.showImageChecked = $scope.logged[key].showImage;
+                            }
+                        });
+                    });                    
                 }
             });
         });
     };
     
-
     $scope.register = function (email, password) {
       if (email && password) {
-          $scope.auth.createUser(email, password, function(error, user) {
-              if (!error) {
-                  $scope.login(email, password);
-              }
-              else {
-                  if (error.code === 'EMAIL_TAKEN') {
-                      toastr.error('The email entered is already taken.');
-                  }
-                  else {
-                      console.log(error);
+        $scope.auth.createUser(email, password, function(error, user) {
+            if (!error) {
+                $scope.login(email, password);
+            }
+            else {
+                if (error.code === 'EMAIL_TAKEN') {
+                    toastr.error('The email entered is already taken.');
                 }
+                else {
+                    console.log(error);
               }
-          });
+            }
+        });
       }
     };
 
@@ -163,6 +184,7 @@ app.controller('MainCtrl', ['$scope', 'FirebaseService', '$firebaseSimpleLogin',
       $scope.currentUser = null;
       $scope.avatar = null;
       $scope.provider = null;
+      $scope.showImageChecked = true;
     };
 
     $scope.resetPassword = function(email) {
