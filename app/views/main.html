@@ -17,17 +17,20 @@
     </div>
     <div ng-show='currentUser'>
         <center>
-            <avatar provider='{{provider}}'></avatar>
-            <br />
-            <br />
+            <div ng-show='showImageChecked'>
+                <avatar provider='{{provider}}'></avatar><br /><br />
+            </div>
             <form ng-show='provider==="password"' ng-submit="changePassword(newUser.oldPassword, newUser.newPpassword)">
                 <input ng-model="newUser.oldPassword" type="password" class="form-control" placeholder="Current Password" Required>
                 <input ng-model="newUser.newPpassword" type="password" class="form-control" placeholder="New Password" Required>
                 <button  class="btn btn-lg btn-warning btn-block" type='submit'>Update</button>
             </form>
             <br />
-            <br />
             <button ng-click="logout()" class="btn btn-lg btn-primary btn-block">Logout</button>
+            <br />
+            <label><input type='checkbox' ng-change='updateShowFlag(showImageChecked)' ng-model='showImageChecked'/>Show Images</label>
+            <br />
+            
         </center>
     </div>
 </div>
