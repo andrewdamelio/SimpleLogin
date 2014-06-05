@@ -1,5 +1,6 @@
 SimpleLogin
 ===========
+
 Authentication demo using AngularJS and
 <a href='https://www.firebase.com/docs/security/simple-login-overview.html'>Firebase Simple Login</a>. 
   - uses only client-side code
@@ -15,3 +16,6 @@ Authentication demo using AngularJS and
 <a href="https://www.firebase.com/docs/security/simple-login-google.html">Authenticating with Google</a><br />
 <a href="https://www.firebase.com/docs/security/simple-login-twitter.html">Authenticating with Twitter</a><br />
 <a href="https://www.firebase.com/docs/security/simple-login-github.html">Authenticating with GitHub</a><br />
+
+<br />
+<sup>built with<a href='https://www.firebase.com/'><img src='http://i.imgur.com/ZVL0Jkt.png'/></sup></a>
