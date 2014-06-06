@@ -1,4 +1,4 @@
-// Generated on 2014-06-03 using generator-angular 0.8.0
+  // Generated on 2014-06-03 using generator-angular 0.8.0
 'use strict';
 
 // # Globbing
@@ -189,7 +189,14 @@ module.exports = function (grunt) {
       html: ['<%= yeoman.dist %>/{,*/}*.html'],
       css: ['<%= yeoman.dist %>/styles/{,*/}*.css'],
       options: {
-        assetsDirs: ['<%= yeoman.dist %>']
+        assetsDirs: ['<%= yeoman.dist %>'],
+         patterns: {
+          css: [
+            [/(\/bower_components\/bootstrap\/dist\/fonts)/g, 'god help me', function(match) {
+              return match.replace('/bower_components/bootstrap/dist/fonts', '../fonts');
+            }]
+          ]
+        }
       }
     },
 
