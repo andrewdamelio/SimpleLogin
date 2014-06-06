@@ -2,7 +2,7 @@
     <h2 class="form-signin-heading" ng-if="currentUser">{{currentUser.displayName}}</h2>
         <div ng-show='currentUser'>
         <center>
-            <div ng-show='showImageChecked'>
+            <div ng-if='currentUser.showImage'>
                 <avatar provider='{{provider}}'></avatar><br /><br />
             </div>
             <a href='#/profile' class="btn btn-lg btn-primary btn-block">Settings</a>

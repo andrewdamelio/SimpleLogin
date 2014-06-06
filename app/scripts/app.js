@@ -10,9 +10,11 @@ app.config(['$routeProvider', function ($routeProvider) {
       })
       .when('/profile', {
         templateUrl: 'views/profile.html',
+        controller: 'ProfileCtrl'        
       })
       .when('/user', {
         templateUrl: 'views/user.html',
+        controller: 'UserCtrl'        
       })      
       .otherwise({
         redirectTo :  '/'
@@ -41,11 +43,12 @@ app.factory('FirebaseService', ['$firebase', '$firebaseSimpleLogin', 'FIREBASE_U
 }]);
 
 app.controller('MainCtrl', ['$scope', '$timeout', '$location', 'FirebaseService', function ($scope, $timeout, $location, FirebaseService) {
-    $scope.newUser = { email: '', password: '' };
+   
+    
     $scope.currentUser  = '';
-    $scope.reset = false;
-    $scope.showImageChecked = true;
+    $scope.newUser = { email: '', password: '' };
     $scope.key;
+    $scope.logged ='';
 
     $scope.authCallback = function(error, user) {
         if (error) {
@@ -89,42 +92,13 @@ app.controller('MainCtrl', ['$scope', '$timeout', '$location', 'FirebaseService'
             $scope.avatar = user.thirdPartyUserData.picture;
           }
           $scope.createProfile($scope.currentUser);
-          $scope.resetForm();
+          $scope.$broadcast('reset');
         }
         else {
           // user is logged out
           $scope.currentUser = null;
         }
     }
-
-    $scope.auth = FirebaseService.getUserAuth($scope.authCallback);
-
-    $scope.login = function (email, password) {
-        if (email  && password) {
-          $scope.auth.login('password', {
-              email: email,
-              password: password
-          });
-        }
-    };
-
-    $scope.google = function() {
-        $scope.auth.login('google');
-    };
-
-    $scope.github = function() {
-        $scope.auth.login('github');
-    };
-
-    $scope.twitter = function() {
-        $scope.auth.login('twitter');
-    };
-
-    $scope.updateShowFlag = function(showFlag) {
-        $scope.showImageChecked = showFlag;
-        $scope.logged[$scope.key].showImage = showFlag;
-        $scope.logged.$save();
-    };
 
     $scope.createProfile = function(user) {
         var newUser = true;
@@ -136,7 +110,8 @@ app.controller('MainCtrl', ['$scope', '$timeout', '$location', 'FirebaseService'
                     if (user.uid === $scope.logged[key].uid) {
                         newUser = false;
                         $scope.key = key;
-                        $scope.showImageChecked = $scope.logged[key].showImage;
+                        $scope.currentUser.displayName = $scope.logged[key].user
+                        $scope.currentUser.showImage = $scope.logged[key].showImage
                         console.log('WELCOME BACK');
                     }
                 });
@@ -153,7 +128,7 @@ app.controller('MainCtrl', ['$scope', '$timeout', '$location', 'FirebaseService'
                             if (user.uid === $scope.logged[key].uid) {
                                 console.log('FIRST SIGNIN');
                                 $scope.key = key;
-                                $scope.showImageChecked = $scope.logged[key].showImage;
+                                $scope.currentUser.showImage = $scope.logged[key].showImage
                             }
                         });
                     });                    
@@ -163,6 +138,79 @@ app.controller('MainCtrl', ['$scope', '$timeout', '$location', 'FirebaseService'
         });
     };
     
+    $scope.auth = FirebaseService.getUserAuth($scope.authCallback);
+
+    $scope.$on('reset', function () {
+        $scope.newUser = { email: '', password: '' };
+        $scope.reset = false;
+        $scope.newPassword = '';
+        $scope.oldPassword = '';
+    });
+
+    $scope.$on('logout', function() {
+        $scope.auth.logout();
+        $scope.$broadcast('reset');
+        $scope.currentUser = null;
+        $scope.avatar = null;
+        $scope.provider = null;
+        $location.url("/");
+    });
+
+
+}]);
+
+// Controller for the Profile page
+// Functions: logout
+app.controller('UserCtrl',['$scope', '$location', function($scope, $location){
+    $scope.logout = function() {
+        $scope.$emit('logout');
+    };
+
+}]);
+
+// Controller for the Profile page
+// Functions: - changing users password
+// Functions: - updatiing users display name
+// Functions: - changing users profiles settings
+app.controller('ProfileCtrl',['$scope', '$location', function($scope, $location){
+    
+    $scope.changePassword = function(password, newPassword) {
+      $scope.auth.changePassword($scope.currentUser.email, password, newPassword, function(error, success) {
+          if (!error) {
+              toastr.clear();
+              toastr.info('Password changed successfully');
+          }
+          else {
+              toastr.clear();
+              toastr.error(error);
+          }
+      });
+      $scope.$emit('reset');
+    };
+
+    $scope.updateDisplayName = function() {
+        if ($scope.currentUser.displayName) {
+          $scope.logged[$scope.key].user  = $scope.currentUser.displayName;
+          $scope.logged.$save();
+        }
+        else {
+          $scope.currentUser.displayName = $scope.logged[$scope.key].user
+        }
+    };
+
+    $scope.updateShowFlag = function() {
+        $scope.logged[$scope.key].showImage = $scope.currentUser.showImage;
+        $scope.logged.$save();
+    };
+
+}]);
+
+// Controller for the Login page
+app.controller('LoginCtrl',['$scope', '$location' ,function($scope, $location){
+    if ($scope.currentUser) {
+      $location.url("/user");
+    }
+
     $scope.register = function (email, password) {
       if (email && password) {
         $scope.auth.createUser(email, password, function(error, user) {
@@ -182,22 +230,26 @@ app.controller('MainCtrl', ['$scope', '$timeout', '$location', 'FirebaseService'
       }
     };
 
-    $scope.resetForm = function () {
-      $scope.newUser = { email: '', password: '' };
-      $scope.reset = false;
-      $scope.newPassword = '';
-      $scope.oldPassword = '';
-      $scope.password = '';
+    $scope.login = function (email, password) {
+        if (email  && password) {
+          $scope.auth.login('password', {
+              email: email,
+              password: password
+          });
+        }
     };
 
-   $scope.logout = function() {
-      $scope.auth.logout();
-      $scope.resetForm();
-      $scope.currentUser = null;
-      $scope.avatar = null;
-      $scope.provider = null;
-      $scope.showImageChecked = true;
-      $location.url("/");
+
+    $scope.google = function() {
+        $scope.auth.login('google');
+    };
+
+    $scope.github = function() {
+        $scope.auth.login('github');
+    };
+
+    $scope.twitter = function() {
+        $scope.auth.login('twitter');
     };
 
     $scope.resetPassword = function(email) {
@@ -212,30 +264,12 @@ app.controller('MainCtrl', ['$scope', '$timeout', '$location', 'FirebaseService'
                 toastr.error(error);
               }
         });
-        $scope.resetForm();
+        $scope.$emit('reset');
       }
-    };
-
-    $scope.changePassword = function(password, newPassword) {
-      $scope.auth.changePassword($scope.currentUser.email, password, newPassword, function(error, success) {
-          if (!error) {
-              toastr.clear();
-              toastr.info('Password changed successfully');
-          }
-          else {
-            toastr.clear();
-            toastr.error(error);
-          }
-      });
-      $scope.resetForm();
-   };
+    };    
 }]);
 
-app.controller('LoginCtrl',['$scope', '$location' ,function($scope, $location){
-    if ($scope.currentUser) {
-      $location.url("/user");
-    }
-}]);
+
 
 app.directive('avatar', [function () {
     return {

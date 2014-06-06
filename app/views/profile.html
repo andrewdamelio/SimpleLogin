@@ -9,11 +9,21 @@
 		  			<i class='glyphicon glyphicon-user'></i>&nbsp;&nbsp;Enable profile image
 				</div>
 				<div class='col-md-2'>  				
-		  			<input type='checkbox' ng-change='updateShowFlag(showImageChecked)' ng-model='showImageChecked'/>
+		  			<input type='checkbox' ng-change='updateShowFlag()' ng-model='currentUser.showImage'/>
 		  		</div>
 			</div>  	
 		</div>
 	</div>
+
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<i class='glyphicon glyphicon-pencil'></i>&nbsp;&nbsp;Change display name
+			<br />
+			<br />
+			<input ng-model="currentUser.displayName" ng-change='updateDisplayName()' type="text" class="form-control" Required>
+		</div>
+	</div>
+
 
 	<form ng-show='provider==="password"' ng-submit="changePassword(newUser.oldPassword, newUser.newPpassword)">
 		<div class="panel panel-default">
