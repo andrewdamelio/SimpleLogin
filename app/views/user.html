@@ -1,0 +1,13 @@
+<div class="form-signin">
+    <h2 class="form-signin-heading" ng-if="currentUser">{{currentUser.displayName}}</h2>
+        <div ng-show='currentUser'>
+        <center>
+            <div ng-show='showImageChecked'>
+                <avatar provider='{{provider}}'></avatar><br /><br />
+            </div>
+            <a href='#/profile' class="btn btn-lg btn-primary btn-block">Settings</a>
+            <button ng-click="logout()" class="btn btn-lg btn-primary btn-block">Logout</button>
+        </center>
+    </div>
+</div>
+

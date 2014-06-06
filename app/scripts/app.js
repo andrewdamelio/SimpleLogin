@@ -1,15 +1,22 @@
 'use strict';
 
-var app = angular.module('simpleLoginApp', ['firebase','ngRoute']);
+var app = angular.module('simpleLoginApp', ['firebase','ngRoute','ngAnimate']);
 
 app.config(['$routeProvider', function ($routeProvider) {
     $routeProvider
       .when('/', {
         templateUrl: 'views/main.html',
-        controller: 'MainCtrl'
+        controller: 'LoginCtrl'
       })
+      .when('/profile', {
+        templateUrl: 'views/profile.html',
+      })
+      .when('/user', {
+        templateUrl: 'views/user.html',
+      })      
       .otherwise({
-        redirectTo: '/'
+        redirectTo :  '/'
+        //templateUrl: '404.html'
       });
   }]);
 
@@ -33,7 +40,7 @@ app.factory('FirebaseService', ['$firebase', '$firebaseSimpleLogin', 'FIREBASE_U
       };
 }]);
 
-app.controller('MainCtrl', ['$scope', '$timeout', 'FirebaseService', function ($scope, $timeout, FirebaseService) {
+app.controller('MainCtrl', ['$scope', '$timeout', '$location', 'FirebaseService', function ($scope, $timeout, $location, FirebaseService) {
     $scope.newUser = { email: '', password: '' };
     $scope.currentUser  = '';
     $scope.reset = false;
@@ -44,12 +51,14 @@ app.controller('MainCtrl', ['$scope', '$timeout', 'FirebaseService', function ($
         if (error) {
           // an error occurred while attempting login
           if (error.code === 'INVALID_PASSWORD') {
+            toastr.clear();
             toastr.error('The email or password you entered is incorrect.');
             $timeout(function() {
                 $scope.reset = true;
             });
           }
           else if (error.code === 'INVALID_USER') {
+            toastr.clear();
             toastr.error('The specified user does not exist.');
           }
           else {
@@ -59,6 +68,7 @@ app.controller('MainCtrl', ['$scope', '$timeout', 'FirebaseService', function ($
         else if (user) {
           // user authenticated with Firebase
           console.log(user);
+          toastr.clear();
           toastr.success('Successfully logged in.');
           $scope.provider = user.provider;
           $scope.currentUser = user;
@@ -148,6 +158,7 @@ app.controller('MainCtrl', ['$scope', '$timeout', 'FirebaseService', function ($
                         });
                     });                    
                 }
+              $location.url("/user");
             });
         });
     };
@@ -160,6 +171,7 @@ app.controller('MainCtrl', ['$scope', '$timeout', 'FirebaseService', function ($
             }
             else {
                 if (error.code === 'EMAIL_TAKEN') {
+                    toastr.clear();
                     toastr.error('The email entered is already taken.');
                 }
                 else {
@@ -185,15 +197,18 @@ app.controller('MainCtrl', ['$scope', '$timeout', 'FirebaseService', function ($
       $scope.avatar = null;
       $scope.provider = null;
       $scope.showImageChecked = true;
+      $location.url("/");
     };
 
     $scope.resetPassword = function(email) {
       if (email) {
         $scope.auth.sendPasswordResetEmail(email, function(error, success) {
               if (!error) {
+                toastr.clear();
                 toastr.info('Password reset email sent successfully');
               }
               else {
+                toastr.clear();
                 toastr.error(error);
               }
         });
@@ -204,14 +219,22 @@ app.controller('MainCtrl', ['$scope', '$timeout', 'FirebaseService', function ($
     $scope.changePassword = function(password, newPassword) {
       $scope.auth.changePassword($scope.currentUser.email, password, newPassword, function(error, success) {
           if (!error) {
+              toastr.clear();
               toastr.info('Password changed successfully');
           }
           else {
-              toastr.error(error);
+            toastr.clear();
+            toastr.error(error);
           }
       });
       $scope.resetForm();
    };
+}]);
+
+app.controller('LoginCtrl',['$scope', '$location' ,function($scope, $location){
+    if ($scope.currentUser) {
+      $location.url("/user");
+    }
 }]);
 
 app.directive('avatar', [function () {

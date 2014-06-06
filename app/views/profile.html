@@ -1,0 +1,32 @@
+<div class="form-signin">
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">Profile Settings</h3>
+		</div>
+	  	<div class="panel-body">
+			<div class='row'>
+		   		<div class='col-md-10'>
+		  			<i class='glyphicon glyphicon-user'></i>&nbsp;&nbsp;Enable profile image
+				</div>
+				<div class='col-md-2'>  				
+		  			<input type='checkbox' ng-change='updateShowFlag(showImageChecked)' ng-model='showImageChecked'/>
+		  		</div>
+			</div>  	
+		</div>
+	</div>
+
+	<form ng-show='provider==="password"' ng-submit="changePassword(newUser.oldPassword, newUser.newPpassword)">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<i class='glyphicon glyphicon-envelope'></i>&nbsp;&nbsp;Change password
+				<br />
+				<br />
+				<input ng-model="newUser.oldPassword" type="password" class="form-control" placeholder="Current Password" Required>
+				<input ng-model="newUser.newPpassword" type="password" class="form-control" placeholder="New Password" Required>
+				<button  class="btn btn-lg btn-warning btn-block" type='submit'>Update</button>
+			</div>
+		</div>
+	</form>
+    
+	<a href='#/user'><i class='glyphicon glyphicon-arrow-left'></i></a>
+</div>
