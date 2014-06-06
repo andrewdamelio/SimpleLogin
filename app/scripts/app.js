@@ -104,37 +104,30 @@ app.controller('MainCtrl', ['$scope', '$timeout', '$location', 'FirebaseService'
         var newUser = true;
         $scope.logged = FirebaseService.getUserProfile(user.provider);
         $scope.logged.$on('loaded', function() {
-            $timeout(function() {
+            
                 var keys = $scope.logged.$getIndex();
                 angular.forEach(keys, function(key) {
                     if (user.uid === $scope.logged[key].uid) {
                         newUser = false;
                         $scope.key = key;
-                        $scope.currentUser.displayName = $scope.logged[key].user
-                        $scope.currentUser.showImage = $scope.logged[key].showImage
+                        $scope.userProfile = $scope.logged[key];
                         console.log('WELCOME BACK');
+                        $location.url("/user");
                     }
                 });
                 if (newUser) {
                     $scope.logged.$add({
                         uid : user.uid,
-                        user:  user.displayName,
+                        displayName:  user.displayName,
                         showImage: true,
+                    }).then(function(ref) {
+                          console.log('FIRST SIGNIN');
+                          $scope.key = ref.name();
+                          $scope.userProfile = {uid :user.id, displayName : user.displayName, showImage:true};
+                          $location.url("/user");
                     });
-                    $scope.logged = FirebaseService.getUserProfile(user.provider);
-                    $scope.logged.$on('loaded', function() {
-                        var keys = $scope.logged.$getIndex();
-                        angular.forEach(keys, function(key) {
-                            if (user.uid === $scope.logged[key].uid) {
-                                console.log('FIRST SIGNIN');
-                                $scope.key = key;
-                                $scope.currentUser.showImage = $scope.logged[key].showImage
-                            }
-                        });
-                    });                    
                 }
-              $location.url("/user");
-            });
+            
         });
     };
     
@@ -162,6 +155,9 @@ app.controller('MainCtrl', ['$scope', '$timeout', '$location', 'FirebaseService'
 // Controller for the Profile page
 // Functions: logout
 app.controller('UserCtrl',['$scope', '$location', function($scope, $location){
+    if (!$scope.currentUser) {
+      $location.url("/");
+    }
     $scope.logout = function() {
         $scope.$emit('logout');
     };
@@ -173,7 +169,9 @@ app.controller('UserCtrl',['$scope', '$location', function($scope, $location){
 // Functions: - updatiing users display name
 // Functions: - changing users profiles settings
 app.controller('ProfileCtrl',['$scope', '$location', function($scope, $location){
-    
+    if (!$scope.currentUser) {
+      $location.url("/");
+    }    
     $scope.changePassword = function(password, newPassword) {
       $scope.auth.changePassword($scope.currentUser.email, password, newPassword, function(error, success) {
           if (!error) {
@@ -188,19 +186,17 @@ app.controller('ProfileCtrl',['$scope', '$location', function($scope, $location)
       $scope.$emit('reset');
     };
 
-    $scope.updateDisplayName = function() {
-        if ($scope.currentUser.displayName) {
-          $scope.logged[$scope.key].user  = $scope.currentUser.displayName;
-          $scope.logged.$save();
-        }
-        else {
-          $scope.currentUser.displayName = $scope.logged[$scope.key].user
-        }
+    $scope.updateProfileImage = function() {
+        $scope.logged[$scope.key].showImage = $scope.userProfile.showImage;
+        $scope.logged.$save($scope.key);
     };
 
-    $scope.updateShowFlag = function() {
-        $scope.logged[$scope.key].showImage = $scope.currentUser.showImage;
-        $scope.logged.$save();
+    $scope.updateDisplayName = function() {
+        if (!$scope.userProfile.displayName) {
+            $scope.userProfile.displayName = $scope.currentUser.displayName;
+        }
+        $scope.logged[$scope.key].displayName = $scope.userProfile.displayName;
+        $scope.logged.$save($scope.key);
     };
 
 }]);

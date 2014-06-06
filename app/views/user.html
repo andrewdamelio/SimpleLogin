@@ -1,8 +1,8 @@
-<div class="form-signin">
-    <h2 class="form-signin-heading" ng-if="currentUser">{{currentUser.displayName}}</h2>
-        <div ng-show='currentUser'>
+<div ng-show='currentUser'>
+    <div class="form-signin">
+    <h2 class="form-signin-heading" ng-if="currentUser">{{userProfile.displayName}}</h2>
         <center>
-            <div ng-if='currentUser.showImage'>
+            <div ng-if='userProfile.showImage'>
                 <avatar provider='{{provider}}'></avatar><br /><br />
             </div>
             <a href='#/profile' class="btn btn-lg btn-primary btn-block">Settings</a>
