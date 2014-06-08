@@ -20,7 +20,7 @@ Authentication demo using AngularJS and
 
 <h4>Firebase Security Rules</h4>
 
-Below is the firebase security rules being used.
+Below are the firebase security rules being used.
 
 
         {  
