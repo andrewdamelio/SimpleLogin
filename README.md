@@ -29,22 +29,22 @@ Below are the firebase security rules being used.
               "users": {
                 "github" : {
                   "$githubid": {
-                    ".write": "auth.uid === data.child('uid').val()"
+                    ".write": "auth.uid === newData.child('uid').val() || auth.uid === data.child('uid').val()"
                   }
                 },
                 "google" : {
                   "$googleid": {
-                    ".write": "auth.uid === data.child('uid').val()"
+                    ".write": "auth.uid === newData.child('uid').val() || auth.uid === data.child('uid').val()"
                   }
                 },
                 "twitter" : {
                   "$twitterid": {
-                    ".write": "auth.uid === data.child('uid').val()"
+                    ".write": "auth.uid === newData.child('uid').val() || auth.uid === data.child('uid').val()"
                   }
                 },
                 "password" : {
                   "$passwordid": {
-                    ".write": "auth.uid === data.child('uid').val()"
+                    ".write": "auth.uid === newData.child('uid').val() || auth.uid === data.child('uid').val()"
                   }
                 }      
               }
