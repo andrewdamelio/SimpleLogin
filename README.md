@@ -18,5 +18,38 @@ Authentication demo using AngularJS and
 <a href="https://www.firebase.com/docs/security/simple-login-twitter.html">Authenticating with Twitter</a><br />
 <a href="https://www.firebase.com/docs/security/simple-login-github.html">Authenticating with GitHub</a><br />
 
+<h4>Firebase Security Rules</h4>
+
+Below is the firebase security rules being used.
+
+
+        {  
+          "rules": {   
+          ".read": true,
+              "users": {
+                "github" : {
+                  "$githubid": {
+                    ".write": "auth.uid === data.child('uid').val()"
+                  }
+                },
+                "google" : {
+                  "$googleid": {
+                    ".write": "auth.uid === data.child('uid').val()"
+                  }
+                },
+                "twitter" : {
+                  "$twitterid": {
+                    ".write": "auth.uid === data.child('uid').val()"
+                  }
+                },
+                "password" : {
+                  "$passwordid": {
+                    ".write": "auth.uid === data.child('uid').val()"
+                  }
+                }      
+              }
+           }
+        }
+
 <br />
 <sup>built with<a href='https://www.firebase.com/'><img src='http://i.imgur.com/ZVL0Jkt.png'/></sup></a>
