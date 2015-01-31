@@ -8,7 +8,7 @@ Authentication demo using AngularJS and
   - email / password authentication
   - user profiles
 
-<a href='http://bittopia.ca/dev/SimpleLogin'>SimpleLogin Demo</a>
+<a href='http://andrewdamel.io/dev/SimpleLogin/'>SimpleLogin Demo</a>
 
 
 <h4>Authenticating Setup</h4>
